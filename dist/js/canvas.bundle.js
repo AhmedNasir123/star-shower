@@ -106,7 +106,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_utils__WEBPACK_IMPORTED_MODULE_0__);
 
 var canvas = document.querySelector('canvas');
-var c = canvas.getContext('2d');
+var context = canvas.getContext('2d');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
@@ -132,15 +132,15 @@ function Star(x, y, radius, color) {
   this.gravity = 1;
 }
 Star.prototype.draw = function () {
-  c.save();
-  c.beginPath();
-  c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-  c.fillStyle = this.color;
-  c.shadowColor = '#E3EAEF';
-  c.shadowBlur = 20;
-  c.fill();
-  c.closePath();
-  c.restore();
+  context.save();
+  context.beginPath();
+  context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+  context.fillStyle = this.color;
+  context.shadowColor = '#E3EAEF';
+  context.shadowBlur = 20;
+  context.fill();
+  context.closePath();
+  context.restore();
 };
 Star.prototype.update = function () {
   this.draw();
@@ -172,15 +172,15 @@ function MiniStar(x, y, radius, color) {
   this.opacity = 1;
 }
 MiniStar.prototype.draw = function () {
-  c.save();
-  c.beginPath();
-  c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-  c.fillStyle = "rgba(227, 234, 239, ".concat(this.opacity = this.ttl / 100, ")");
-  c.shadowColor = '#E3EAEF';
-  c.shadowBlur = 20;
-  c.fill();
-  c.closePath();
-  c.restore();
+  context.save();
+  context.beginPath();
+  context.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+  context.fillStyle = "rgba(227, 234, 239, ".concat(this.opacity = this.ttl / 100, ")");
+  context.shadowColor = '#E3EAEF';
+  context.shadowBlur = 20;
+  context.fill();
+  context.closePath();
+  context.restore();
 };
 MiniStar.prototype.update = function () {
   this.draw();
@@ -198,32 +198,36 @@ MiniStar.prototype.update = function () {
 function createMountainRange(mountainAmount, height, color) {
   for (var i = 0; i < mountainAmount; i++) {
     var mountainWidth = canvas.width / mountainAmount;
-    c.beginPath();
-    c.moveTo(i * mountainWidth, canvas.height);
-    c.lineTo(i * mountainWidth + mountainWidth + 325, canvas.height);
-    c.lineTo(i * mountainWidth + mountainWidth / 2, canvas.height - height);
-    c.lineTo(i * mountainWidth - 325, canvas.height);
-    c.fillStyle = color;
-    c.fill();
-    c.closePath();
+    context.beginPath();
+    context.moveTo(i * mountainWidth, canvas.height);
+    context.lineTo(i * mountainWidth + mountainWidth + 325, canvas.height);
+    context.lineTo(i * mountainWidth + mountainWidth / 2, canvas.height - height);
+    context.lineTo(i * mountainWidth - 325, canvas.height);
+    context.fillStyle = color;
+    context.fill();
+    context.closePath();
   }
 }
 
 // Implementation
-var backgroundGrad = c.createLinearGradient(0, 0, 0, canvas.height);
+var backgroundGrad = context.createLinearGradient(0, 0, 0, canvas.height);
 backgroundGrad.addColorStop(0, '#171e26');
 backgroundGrad.addColorStop(1, '#3f586b');
 var stars;
 var miniStars;
 var backgroundStars;
+var ticker = 0;
+var randomSpawnRate = 75;
 function init() {
   stars = [];
   miniStars = [];
   backgroundStars = [];
-  for (var i = 0; i < 1; i++) {
-    stars.push(new Star(canvas.width / 2, 30, 30, '#E3EAEF'));
-  }
-  for (var _i = 0; _i < 150; _i++) {
+
+  // for (let i = 0; i < 1; i++) {
+  //   stars.push(new Star(canvas.width / 2, 30, 30, '#E3EAEF'));
+  // }
+
+  for (var i = 0; i < 150; i++) {
     var x = Math.random() * canvas.width;
     var y = Math.random() * canvas.height;
     var radius = Math.random() * 3;
@@ -234,8 +238,8 @@ function init() {
 // Animation Loop
 function animate() {
   requestAnimationFrame(animate);
-  c.fillStyle = backgroundGrad;
-  c.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = backgroundGrad;
+  context.fillRect(0, 0, canvas.width, canvas.height);
   backgroundStars.forEach(function (backgroundStar) {
     backgroundStar.draw();
   });
@@ -254,6 +258,12 @@ function animate() {
       miniStars.splice(index, 1);
     }
   });
+  ticker++;
+  if (ticker % randomSpawnRate == 0) {
+    var x = Math.random() * canvas.width;
+    stars.push(new Star(x, -100, 12, 'white'));
+    randomSpawnRate = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(75, 200);
+  }
 }
 init();
 animate();
