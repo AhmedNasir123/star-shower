@@ -132,11 +132,15 @@ function Star(x, y, radius, color) {
   this.gravity = 1;
 }
 Star.prototype.draw = function () {
+  c.save();
   c.beginPath();
   c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
   c.fillStyle = this.color;
+  c.shadowColor = '#E3EAEF';
+  c.shadowBlur = 20;
   c.fill();
   c.closePath();
+  c.restore();
 };
 Star.prototype.update = function () {
   this.draw();
@@ -168,11 +172,15 @@ function MiniStar(x, y, radius, color) {
   this.opacity = 1;
 }
 MiniStar.prototype.draw = function () {
+  c.save();
   c.beginPath();
   c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-  c.fillStyle = "rgba(255, 0, 0, ".concat(this.opacity = this.ttl / 100, ")");
+  c.fillStyle = "rgba(227, 234, 239, ".concat(this.opacity = this.ttl / 100, ")");
+  c.shadowColor = '#E3EAEF';
+  c.shadowBlur = 20;
   c.fill();
   c.closePath();
+  c.restore();
 };
 MiniStar.prototype.update = function () {
   this.draw();
@@ -207,11 +215,19 @@ backgroundGrad.addColorStop(0, '#171e26');
 backgroundGrad.addColorStop(1, '#3f586b');
 var stars;
 var miniStars;
+var backgroundStars;
 function init() {
   stars = [];
   miniStars = [];
+  backgroundStars = [];
   for (var i = 0; i < 1; i++) {
-    stars.push(new Star(canvas.width / 2, 30, 30, 'blue'));
+    stars.push(new Star(canvas.width / 2, 30, 30, '#E3EAEF'));
+  }
+  for (var _i = 0; _i < 150; _i++) {
+    var x = Math.random() * canvas.width;
+    var y = Math.random() * canvas.height;
+    var radius = Math.random() * 3;
+    backgroundStars.push(new Star(x, y, radius, 'white'));
   }
 }
 
@@ -220,6 +236,9 @@ function animate() {
   requestAnimationFrame(animate);
   c.fillStyle = backgroundGrad;
   c.fillRect(0, 0, canvas.width, canvas.height);
+  backgroundStars.forEach(function (backgroundStar) {
+    backgroundStar.draw();
+  });
   createMountainRange(1, canvas.height - 50, '#384551');
   createMountainRange(2, canvas.height - 100, '#2b3843');
   createMountainRange(3, canvas.height - 300, '#26333e');
