@@ -104,25 +104,14 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/js/utils.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_utils__WEBPACK_IMPORTED_MODULE_0__);
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 var canvas = document.querySelector('canvas');
 var c = canvas.getContext('2d');
 canvas.width = innerWidth;
 canvas.height = innerHeight;
-var mouse = {
-  x: innerWidth / 2,
-  y: innerHeight / 2
-};
 var colors = ['#2185C5', '#7ECEFD', '#FFF6E5', '#FF7F66'];
 
 // Event Listeners
-addEventListener('mousemove', function (event) {
-  mouse.x = event.clientX;
-  mouse.y = event.clientY;
-});
 addEventListener('resize', function () {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
@@ -130,36 +119,79 @@ addEventListener('resize', function () {
 });
 
 // Objects
-var _Object = /*#__PURE__*/function () {
-  function Object(x, y, radius, color) {
-    _classCallCheck(this, Object);
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
+function Star(x, y, radius, color) {
+  this.x = x;
+  this.y = y;
+  this.radius = radius;
+  this.color = color;
+  this.velocity = {
+    x: 0,
+    y: 3
+  };
+  this.friction = 0.8;
+  this.gravity = 1;
+}
+Star.prototype.draw = function () {
+  c.beginPath();
+  c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+  c.fillStyle = this.color;
+  c.fill();
+  c.closePath();
+};
+Star.prototype.update = function () {
+  this.draw();
+
+  // When ball hits the bottom of screen
+  if (this.y + this.radius + this.velocity.y > canvas.height) {
+    this.velocity.y = -this.velocity.y * this.friction;
+    this.shatter();
+  } else {
+    this.velocity.y += this.gravity;
   }
-  _createClass(Object, [{
-    key: "draw",
-    value: function draw() {
-      c.beginPath();
-      c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-      c.fillStyle = this.color;
-      c.fill();
-      c.closePath();
-    }
-  }, {
-    key: "update",
-    value: function update() {
-      this.draw();
-    }
-  }]);
-  return Object;
-}(); // Implementation
-var objects;
+  this.y += this.velocity.y;
+};
+Star.prototype.shatter = function () {
+  for (var i = 0; i < 8; i++) {
+    miniStars.push(new MiniStar(this.x, this.y, 2, 'red'));
+  }
+};
+function MiniStar(x, y, radius, color) {
+  Star.call(this, x, y, radius, color);
+  this.velocity = {
+    x: _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-5, 5),
+    y: _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-15, 15)
+  };
+  this.friction = 0.8;
+  this.gravity = 0.1;
+}
+MiniStar.prototype.draw = function () {
+  c.beginPath();
+  c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+  c.fillStyle = this.color;
+  c.fill();
+  c.closePath();
+};
+MiniStar.prototype.update = function () {
+  this.draw();
+
+  // When ball hits the bottom of screen
+  if (this.y + this.radius + this.velocity.y > canvas.height) {
+    this.velocity.y = -this.velocity.y * this.friction;
+  } else {
+    this.velocity.y += this.gravity;
+  }
+  this.x += this.velocity.x;
+  this.y += this.velocity.y;
+};
+
+// Implementation
+var stars;
+var miniStars;
 function init() {
-  objects = [];
-  for (var i = 0; i < 400; i++) {
-    // objects.push()
+  stars = [];
+  miniStars = [];
+  for (var i = 0; i < 1; i++) {
+    stars.push(new Star(canvas.width / 2, 30, 30, 'blue'));
   }
 }
 
@@ -167,10 +199,12 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
-  c.fillText('HTML CANVAS BOILERPLATE', mouse.x, mouse.y);
-  // objects.forEach(object => {
-  //  object.update()
-  // })
+  stars.forEach(function (star) {
+    star.update();
+  });
+  miniStars.forEach(function (miniStar) {
+    miniStar.update();
+  });
 }
 init();
 animate();
