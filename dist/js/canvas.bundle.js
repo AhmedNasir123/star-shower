@@ -153,7 +153,7 @@ Star.prototype.update = function () {
 Star.prototype.shatter = function () {
   this.radius -= 3;
   for (var i = 0; i < 8; i++) {
-    miniStars.push(new MiniStar(this.x, this.y, 2, 'red'));
+    miniStars.push(new MiniStar(this.x, this.y, 2));
   }
 };
 function MiniStar(x, y, radius, color) {
@@ -165,11 +165,12 @@ function MiniStar(x, y, radius, color) {
   this.friction = 0.8;
   this.gravity = 0.1;
   this.ttl = 100;
+  this.opacity = 1;
 }
 MiniStar.prototype.draw = function () {
   c.beginPath();
   c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-  c.fillStyle = this.color;
+  c.fillStyle = "rgba(255, 0, 0, ".concat(this.opacity = this.ttl / 100, ")");
   c.fill();
   c.closePath();
 };
@@ -186,8 +187,24 @@ MiniStar.prototype.update = function () {
   this.y += this.velocity.y;
   this.ttl -= 1;
 };
+function createMountainRange(mountainAmount, height, color) {
+  for (var i = 0; i < mountainAmount; i++) {
+    var mountainWidth = canvas.width / mountainAmount;
+    c.beginPath();
+    c.moveTo(i * mountainWidth, canvas.height);
+    c.lineTo(i * mountainWidth + mountainWidth + 325, canvas.height);
+    c.lineTo(i * mountainWidth + mountainWidth / 2, canvas.height - height);
+    c.lineTo(i * mountainWidth - 325, canvas.height);
+    c.fillStyle = color;
+    c.fill();
+    c.closePath();
+  }
+}
 
 // Implementation
+var backgroundGrad = c.createLinearGradient(0, 0, 0, canvas.height);
+backgroundGrad.addColorStop(0, '#171e26');
+backgroundGrad.addColorStop(1, '#3f586b');
 var stars;
 var miniStars;
 function init() {
@@ -201,7 +218,11 @@ function init() {
 // Animation Loop
 function animate() {
   requestAnimationFrame(animate);
-  c.clearRect(0, 0, canvas.width, canvas.height);
+  c.fillStyle = backgroundGrad;
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  createMountainRange(1, canvas.height - 50, '#384551');
+  createMountainRange(2, canvas.height - 100, '#2b3843');
+  createMountainRange(3, canvas.height - 300, '#26333e');
   stars.forEach(function (star, index) {
     star.update();
     if (star.radius == 0) {
