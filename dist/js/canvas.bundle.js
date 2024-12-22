@@ -151,6 +151,7 @@ Star.prototype.update = function () {
   this.y += this.velocity.y;
 };
 Star.prototype.shatter = function () {
+  this.radius -= 3;
   for (var i = 0; i < 8; i++) {
     miniStars.push(new MiniStar(this.x, this.y, 2, 'red'));
   }
@@ -163,6 +164,7 @@ function MiniStar(x, y, radius, color) {
   };
   this.friction = 0.8;
   this.gravity = 0.1;
+  this.ttl = 100;
 }
 MiniStar.prototype.draw = function () {
   c.beginPath();
@@ -182,6 +184,7 @@ MiniStar.prototype.update = function () {
   }
   this.x += this.velocity.x;
   this.y += this.velocity.y;
+  this.ttl -= 1;
 };
 
 // Implementation
@@ -199,11 +202,17 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
-  stars.forEach(function (star) {
+  stars.forEach(function (star, index) {
     star.update();
+    if (star.radius == 0) {
+      stars.splice(index, 1);
+    }
   });
-  miniStars.forEach(function (miniStar) {
+  miniStars.forEach(function (miniStar, index) {
     miniStar.update();
+    if (miniStar.ttl == 0) {
+      miniStars.splice(index, 1);
+    }
   });
 }
 init();

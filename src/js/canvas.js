@@ -54,6 +54,7 @@ function Star(x, y, radius, color) {
   }
 
   Star.prototype.shatter = function() {
+    this.radius -= 3;
     for (let i = 0; i < 8; i++) {
       miniStars.push(new MiniStar(this.x, this.y, 2, 'red'));
     }
@@ -67,6 +68,7 @@ function Star(x, y, radius, color) {
     }
     this.friction = 0.8;
     this.gravity = 0.1;
+    this.ttl = 100;
   }
 
   MiniStar.prototype.draw = function() {
@@ -89,6 +91,7 @@ function Star(x, y, radius, color) {
 
     this.x += this.velocity.x;
     this.y += this.velocity.y;
+    this.ttl -= 1;
   }
 
 // Implementation
@@ -108,12 +111,18 @@ function animate() {
   requestAnimationFrame(animate);
   c.clearRect(0, 0, canvas.width, canvas.height);
 
-   stars.forEach(star => {
+   stars.forEach((star, index) => {
     star.update();
+    if(star.radius == 0) {
+      stars.splice(index, 1)
+    }
    });
 
-   miniStars.forEach(miniStar => {
+   miniStars.forEach((miniStar, index) => {
     miniStar.update();
+    if(miniStar.ttl == 0) {
+      miniStars.splice(index, 1)
+    }
    });
 }
 
